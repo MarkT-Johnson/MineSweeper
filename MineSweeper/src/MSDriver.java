@@ -21,8 +21,11 @@ public class MSDriver {
 		Board checkField = new Board(7, 7, true);
 		int totalMines = 0;
 		int foundMines = 0;
-		int outcome = 0;
+		boolean dead = false;
 		boolean exit = false;
+		boolean firstMove = true;
+		
+		//=========================================================================================
 
 		//Set all elements in checkField to false
 		for(int r = 1; r < checkField.getBolBoard().length - 1; r++){
@@ -31,12 +34,16 @@ public class MSDriver {
 			}
 		}
 
+		//---------------------------------------------------------------------
+		
 		//set values for playersField
 		for(int r = 1; r < playerField.getIntBoard().length - 1; r++){
 			for(int c = 1; c < playerField.getIntBoard()[0].length - 1; c++){
 				playerField.getIntBoard()[r][c] = -1;
 			}
 		}
+		
+		//---------------------------------------------------------------------
 
 		printField(playerField.getIntBoard());
 
@@ -46,6 +53,9 @@ public class MSDriver {
 				checkField.getBolBoard()[r][c] = true;
 			}
 		}
+		
+		//---------------------------------------------------------------------
+		
 		//Sets all the inner values of checkField to false to make a ring of true around them
 		//finally creating the wall in completion
 		for(int r = 1; r < checkField.getBolBoard().length - 1; r++){
@@ -54,11 +64,12 @@ public class MSDriver {
 			}
 		}
 		
+		//---------------------------------------------------------------------
 
 		//Set mine positions for the computer board
 		for(int r = 1; r < compField.getIntBoard().length - 1; r++){
 			for(int c = 1; c < compField.getIntBoard()[0].length - 1; c++){
-				if(Math.random() > 0.8){
+				if(Math.random() > 0){
 					compField.getIntBoard()[r][c] = 9;
 					totalMines++;
 				}
@@ -67,20 +78,45 @@ public class MSDriver {
 				}
 			}
 		}
+		
+		//---------------------------------------------------------------------
 
 		//Assign Number of mines to unoccupied squares
 		findMines(compField.getIntBoard());
 
+		//=========================================================================================
+		
 		//Game Play begins
-		while(!exit && foundMines != totalMines){
+		while(!exit && foundMines < totalMines){
 			int[] playersMove = playersMove(playerField.getIntBoard());
 
 			if(playersMove[2] == 0  && 9 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-				outcome = 1;
-				exit = true;
+				
+				//Removes players chance to hit mine on first play
+				if(firstMove) {
+					compField.getIntBoard()[playersMove[0]][playersMove[1]] = 0;
+					findMines(compField.getIntBoard());
+					firstMove = false;
+					
+					if(0 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
+						clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getIntBoard(), checkField.getBolBoard());
+					}
+					else{
+						playerField.getIntBoard()[playersMove[0]][playersMove[1]] = compField.getIntBoard()[playersMove[0]][playersMove[1]];
+					}
+					printField(playerField.getIntBoard());
+				}
+				else {
+					dead = true;
+					exit = true;
+				}
+				
 
 			}
 			else if(playersMove[2] == 0){
+				if(firstMove) {
+					firstMove = !firstMove;
+				}
 				if(0 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
 					clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getIntBoard(), checkField.getBolBoard());
 				}
@@ -100,7 +136,7 @@ public class MSDriver {
 			}
 		}
 
-		if(outcome == 1){
+		if(dead){
 			System.out.println("Game Over! You hit a mine!\nHere is the entire board");
 			System.out.println("Player's Board");
 			printField(playerField.getIntBoard());
@@ -116,6 +152,7 @@ public class MSDriver {
 		}
 	}
 
+	//=============================================================================================
 
 	/*
 	 * 
