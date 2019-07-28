@@ -24,7 +24,7 @@ public class MSDriver {
 		boolean dead = false;
 		boolean exit = false;
 		boolean firstMove = true;
-		
+
 		//=========================================================================================
 
 		//Set all elements in checkField to false
@@ -35,14 +35,14 @@ public class MSDriver {
 		}
 
 		//---------------------------------------------------------------------
-		
+
 		//set values for playersField
 		for(int r = 1; r < playerField.getCharBoard().length - 1; r++){
 			for(int c = 1; c < playerField.getCharBoard()[0].length - 1; c++){
-/*TODO*/		playerField.getCharBoard()[r][c] = '?';
+				playerField.getCharBoard()[r][c] = '?';
 			}
 		}
-		
+
 		//---------------------------------------------------------------------
 
 		printField(playerField.getCharBoard());
@@ -53,9 +53,9 @@ public class MSDriver {
 				checkField.getBolBoard()[r][c] = true;
 			}
 		}
-		
+
 		//---------------------------------------------------------------------
-		
+
 		//Sets all the inner values of checkField to false to make a ring of true around them
 		//finally creating the wall in completion
 		for(int r = 1; r < checkField.getBolBoard().length - 1; r++){
@@ -63,7 +63,7 @@ public class MSDriver {
 				checkField.getBolBoard()[r][c] = false;
 			}
 		}
-		
+
 		//---------------------------------------------------------------------
 
 		//Set mine positions for the computer board
@@ -78,32 +78,32 @@ public class MSDriver {
 				}
 			}
 		}
-		
+
 		//---------------------------------------------------------------------
 
 		//Assign Number of mines to unoccupied squares
 		findMines(compField.getIntBoard());
 
 		//=========================================================================================
-		
+
 		//Game Play begins
 		while(!exit && foundMines < totalMines){
-	/*TODO*/int[] playersMove = playersMove(playerField.getCharBoard());
-			
+			int[] playersMove = playersMove(playerField.getCharBoard());
+
 			//Player hits mine unless its their first move
 			if(playersMove[2] == 0  && 9 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-				
+
 				//Removes players chance to hit mine on first play
 				if(firstMove) {
 					compField.getIntBoard()[playersMove[0]][playersMove[1]] = 0;
 					findMines(compField.getIntBoard());
 					firstMove = false;
-					
+
 					if(0 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
 						clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getCharBoard(), checkField.getBolBoard());
 					}
 					else{
-	/*TODO*/			playerField.getCharBoard()[playersMove[0]][playersMove[1]] = convertInt(compField.getIntBoard()[playersMove[0]][playersMove[1]]);
+						playerField.getCharBoard()[playersMove[0]][playersMove[1]] = convertInt(compField.getIntBoard()[playersMove[0]][playersMove[1]]);
 					}
 					printField(playerField.getCharBoard());
 				}
@@ -111,7 +111,7 @@ public class MSDriver {
 					dead = true;
 					exit = true;
 				}
-				
+
 
 			}
 			//Player does not hit a mine
@@ -129,13 +129,13 @@ public class MSDriver {
 			}
 			//Player flags a mine
 			else if(playersMove[2] == 1  && 9 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 9;
+				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 'F';
 				printField(playerField.getCharBoard());
 				foundMines++;
 			}
 			//Player flags an empty square
 			else{
-				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 9;
+				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 'F';
 				printField(playerField.getCharBoard());
 			}
 		}
@@ -170,14 +170,14 @@ public class MSDriver {
 		for(int u = -1; u < 2; u++){
 			for(int v = -1; v < 2; v++){
 				if(0 == compBoard[r + u][c + v]){
-	/*TODO*/		playerBoard[r + u][c + v] = convertInt(compBoard[r + u][c + v]);
+					playerBoard[r + u][c + v] = convertInt(compBoard[r + u][c + v]);
 					checkBoard[r][c] = true;
 					if(!checkBoard[r + u][c + v]){
 						clearEmpty(r + u, c + v, compBoard, playerBoard, checkBoard);
 					}
 				}
 				else{
-	/*TODO*/		playerBoard[r  + u][c + v] = convertInt(compBoard[r + u][c + v]);
+					playerBoard[r  + u][c + v] = convertInt(compBoard[r + u][c + v]);
 				}
 			}
 		}
@@ -212,9 +212,9 @@ public class MSDriver {
 		System.out.println("(1, 1, action)\nThis places the action at the bottom left corner");
 
 
-		//Takes in the coordinates given by the player and separates everything based on the commas
+		//Takes in the coordinates given by the player and separates everything based on the commas/periods
 		String playersMove = input.nextLine();
-		String[] coordinates = playersMove.split(",");
+		String[] coordinates = playersMove.split("[,.]");
 
 		//Removes spaces and noninteger characters
 		String column = coordinates[0].trim().replaceAll("[^0-9]", "");
@@ -238,11 +238,11 @@ public class MSDriver {
 
 		return move;
 	}
-	
+
 	private static char convertInt(int value) {
 		char character;
 		if(value < 9 && value > 0) {
-			character = (char) value;
+			character = (char) (value + 48);
 		}
 		else if(value == 9) {
 			character = 'M';
@@ -250,25 +250,25 @@ public class MSDriver {
 		else {
 			character = '_';
 		}
-		
+
 		return character;
 	}
-	
+
 	//Prints out the passed integer field
 	private static void printField(int[][] board){
 
 		for(int r = 1; r < board.length - 1; r++){
 			System.out.print("\n");
 			for(int c = 1; c < board[0].length - 1; c++){
-				System.out.printf("%-3d", board[r][c]);
+				System.out.printf("%-3c", convertInt(board[r][c]));
 			}
 		}
 		System.out.println("\n");
 	}
-	
+
 	//Prints out the passed boolean field
 	private static void printField(boolean[][] board){
-		
+
 		for(int r = 1; r < board.length - 1; r++){
 			System.out.print("\n");
 			for(int c = 1; c < board[0].length - 1; c++){
@@ -277,14 +277,14 @@ public class MSDriver {
 		}
 		System.out.println("\n");
 	}
-	
-	
+
+
 	private static void printField(char[][] board) {
-		
+
 		for(int r = 1; r < board.length - 1; r++){
 			System.out.print("\n");
 			for(int c = 1; c < board[0].length - 1; c++){
-				System.out.print(board[r][c]);
+				System.out.printf("%-3c", board[r][c]);
 			}
 		}
 		System.out.println("\n");
