@@ -2,6 +2,7 @@
 public class Board {
 	private int[][] intBoard;
 	private boolean[][] bolBoard;
+	private char[][] charBoard;
 	private int rows;
 	private int columns;
 	
@@ -14,10 +15,16 @@ public class Board {
 		rows = r;
 		columns = c;
 	}
-	
+	//Boolean board
 	public Board(int r, int c, boolean random){
 		
 		bolBoard = new boolean[r][c];
+		rows = r;
+		columns = c;
+	}
+	
+	public Board(int r, int c, char random) {
+		charBoard = new char[r][c];
 		rows = r;
 		columns = c;
 	}
@@ -53,5 +60,11 @@ public class Board {
 
 	public void setColumns(int columns) {
 		this.columns = columns;
+	}
+	public char[][] getCharBoard() {
+		return charBoard;
+	}
+	public void setCharBoard(char[][] charBoard) {
+		this.charBoard = charBoard;
 	}
 }

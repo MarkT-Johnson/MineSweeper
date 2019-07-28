@@ -16,7 +16,7 @@ public class MSDriver {
 	private static Scanner input = new Scanner(System.in);
 
 	public static void main(String[] args){
-		Board playerField = new Board(7, 7, 1);
+		Board playerField = new Board(7, 7, 'c');
 		Board compField = new Board(7, 7, 1);
 		Board checkField = new Board(7, 7, true);
 		int totalMines = 0;
@@ -37,15 +37,15 @@ public class MSDriver {
 		//---------------------------------------------------------------------
 		
 		//set values for playersField
-		for(int r = 1; r < playerField.getIntBoard().length - 1; r++){
-			for(int c = 1; c < playerField.getIntBoard()[0].length - 1; c++){
-				playerField.getIntBoard()[r][c] = -1;
+		for(int r = 1; r < playerField.getCharBoard().length - 1; r++){
+			for(int c = 1; c < playerField.getCharBoard()[0].length - 1; c++){
+/*TODO*/		playerField.getCharBoard()[r][c] = '?';
 			}
 		}
 		
 		//---------------------------------------------------------------------
 
-		printField(playerField.getIntBoard());
+		printField(playerField.getCharBoard());
 
 		//Sets all values in checkField to true to begin the wall
 		for(int r = 0; r < checkField.getBolBoard().length; r++){
@@ -69,7 +69,7 @@ public class MSDriver {
 		//Set mine positions for the computer board
 		for(int r = 1; r < compField.getIntBoard().length - 1; r++){
 			for(int c = 1; c < compField.getIntBoard()[0].length - 1; c++){
-				if(Math.random() > 0){
+				if(Math.random() > 0.8){
 					compField.getIntBoard()[r][c] = 9;
 					totalMines++;
 				}
@@ -88,8 +88,9 @@ public class MSDriver {
 		
 		//Game Play begins
 		while(!exit && foundMines < totalMines){
-			int[] playersMove = playersMove(playerField.getIntBoard());
-
+	/*TODO*/int[] playersMove = playersMove(playerField.getCharBoard());
+			
+			//Player hits mine unless its their first move
 			if(playersMove[2] == 0  && 9 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
 				
 				//Removes players chance to hit mine on first play
@@ -99,12 +100,12 @@ public class MSDriver {
 					firstMove = false;
 					
 					if(0 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-						clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getIntBoard(), checkField.getBolBoard());
+						clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getCharBoard(), checkField.getBolBoard());
 					}
 					else{
-						playerField.getIntBoard()[playersMove[0]][playersMove[1]] = compField.getIntBoard()[playersMove[0]][playersMove[1]];
+	/*TODO*/			playerField.getCharBoard()[playersMove[0]][playersMove[1]] = convertInt(compField.getIntBoard()[playersMove[0]][playersMove[1]]);
 					}
-					printField(playerField.getIntBoard());
+					printField(playerField.getCharBoard());
 				}
 				else {
 					dead = true;
@@ -113,40 +114,43 @@ public class MSDriver {
 				
 
 			}
+			//Player does not hit a mine
 			else if(playersMove[2] == 0){
 				if(firstMove) {
 					firstMove = !firstMove;
 				}
 				if(0 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-					clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getIntBoard(), checkField.getBolBoard());
+					clearEmpty(playersMove[0], playersMove[1], compField.getIntBoard(), playerField.getCharBoard(), checkField.getBolBoard());
 				}
 				else{
-					playerField.getIntBoard()[playersMove[0]][playersMove[1]] = compField.getIntBoard()[playersMove[0]][playersMove[1]];
+					playerField.getCharBoard()[playersMove[0]][playersMove[1]] = convertInt(compField.getIntBoard()[playersMove[0]][playersMove[1]]);
 				}
-				printField(playerField.getIntBoard());
+				printField(playerField.getCharBoard());
 			}
+			//Player flags a mine
 			else if(playersMove[2] == 1  && 9 == compField.getIntBoard()[playersMove[0]][playersMove[1]]){
-				playerField.getIntBoard()[playersMove[0]][playersMove[1]] = 9;
-				printField(playerField.getIntBoard());
+				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 9;
+				printField(playerField.getCharBoard());
 				foundMines++;
 			}
+			//Player flags an empty square
 			else{
-				playerField.getIntBoard()[playersMove[0]][playersMove[1]] = 9;
-				printField(playerField.getIntBoard());
+				playerField.getCharBoard()[playersMove[0]][playersMove[1]] = 9;
+				printField(playerField.getCharBoard());
 			}
 		}
 
 		if(dead){
 			System.out.println("Game Over! You hit a mine!\nHere is the entire board");
 			System.out.println("Player's Board");
-			printField(playerField.getIntBoard());
+			printField(playerField.getCharBoard());
 			System.out.println("Unveiled Board");
 			printField(compField.getIntBoard());
 		}
 		else{
 			System.out.println("You've found all the mines!\nHere is the entire board");
 			System.out.println("Player's Board");
-			printField(playerField.getIntBoard());
+			printField(playerField.getCharBoard());
 			System.out.println("Unveiled Board");
 			printField(compField.getIntBoard());
 		}
@@ -161,19 +165,19 @@ public class MSDriver {
 	 */
 
 	//Clears multiple squares when an empty square is found
-	private static void clearEmpty(int r, int c, int[][] compBoard, int[][] playerBoard, boolean[][] checkBoard){
+	private static void clearEmpty(int r, int c, int[][] compBoard, char[][] playerBoard, boolean[][] checkBoard){
 
 		for(int u = -1; u < 2; u++){
 			for(int v = -1; v < 2; v++){
 				if(0 == compBoard[r + u][c + v]){
-					playerBoard[r + u][c + v] = compBoard[r + u][c + v];
+	/*TODO*/		playerBoard[r + u][c + v] = convertInt(compBoard[r + u][c + v]);
 					checkBoard[r][c] = true;
 					if(!checkBoard[r + u][c + v]){
 						clearEmpty(r + u, c + v, compBoard, playerBoard, checkBoard);
 					}
 				}
 				else{
-					playerBoard[r  + u][c + v] = compBoard[r + u][c + v];
+	/*TODO*/		playerBoard[r  + u][c + v] = convertInt(compBoard[r + u][c + v]);
 				}
 			}
 		}
@@ -199,7 +203,7 @@ public class MSDriver {
 		}
 	}
 	//Prompt Player for a move
-	private static int[] playersMove(int[][] board){
+	private static int[] playersMove(char[][] board){
 		int hold;
 
 		//Prompt user for coordinates and action
@@ -235,6 +239,21 @@ public class MSDriver {
 		return move;
 	}
 	
+	private static char convertInt(int value) {
+		char character;
+		if(value < 9 && value > 0) {
+			character = (char) value;
+		}
+		else if(value == 9) {
+			character = 'M';
+		}
+		else {
+			character = '_';
+		}
+		
+		return character;
+	}
+	
 	//Prints out the passed integer field
 	private static void printField(int[][] board){
 
@@ -248,7 +267,19 @@ public class MSDriver {
 	}
 	
 	//Prints out the passed boolean field
-	private static void printFieldBoolean(boolean[][] board){
+	private static void printField(boolean[][] board){
+		
+		for(int r = 1; r < board.length - 1; r++){
+			System.out.print("\n");
+			for(int c = 1; c < board[0].length - 1; c++){
+				System.out.print(board[r][c]);
+			}
+		}
+		System.out.println("\n");
+	}
+	
+	
+	private static void printField(char[][] board) {
 		
 		for(int r = 1; r < board.length - 1; r++){
 			System.out.print("\n");
